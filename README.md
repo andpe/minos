@@ -8,6 +8,6 @@ To start the application you also need the consumer token and consumer secret fo
 
 These two tokens need to be inserted into the database manually (for now):
 ```sql
-INSERT INTO oauth_settings (provider_name, "key", value) VALUES('twitter', 'consumer_key', 'KEY_GOES_HERE')
-INSERT INTO oauth_settings (provider_name, "key", value) VALUES('twitter', 'consumer_secret', 'SECRET_GOES_HERE')
+INSERT INTO oauth_settings (provider_name, "key", value) VALUES('twitter', 'consumer_key', 'KEY_GOES_HERE');
+INSERT INTO oauth_settings (provider_name, "key", value) VALUES('twitter', 'consumer_secret', 'SECRET_GOES_HERE');
 ```
