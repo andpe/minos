@@ -12,7 +12,7 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
         <style>
-            #content {
+            .sitecontent, #content {
                 margin-top: 1em;
             }
         </style>
@@ -23,18 +23,56 @@
         <div class="container">
             <a class="navbar-brand" href="/music/">Minos</a>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto">
-                    <li class="navbar-item active">
+                <ul class="nav navbar-nav mr-auto">
+                    <li class="nav-item active">
                         <a href="/music/" class="nav-link">Sonos queue</a>
                     </li>
-                    <li class="navbar-item">
+                    <li class="nav-item">
                         <a href="/settings/" class="nav-link">Settings</a>
                     </li>
                 </ul>
+                {% if 'username' not in session %}
+                <ul class="nav navbar-nav justify-content-end">
+                    <li class="nav-item">
+                        <a href="/users/login" class="nav-link">Login</a>
+                    </li>
+                </ul>
+                {% else %}
+                    <ul class="nav navbar-nav justify-content-end">
+                        <li class="nav-item">
+                            <span class="navbar-text nav-link">
+                                Welcome back, {{ session['username'] }}
+                            </span>
+                        </li>
+                        <li class="nav-item">
+                            <form action="/users/logout" method="POST">
+                                <button class="btn btn-danger">
+                                    Log out
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                {% endif %}
             </div>
         </div>
     </nav>
     {% endblock %}
+    <div class="container">
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alerts">
+            {% for message in messages %}
+                <div class="alert alert-dismissable alert-success fade show">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                    </button>
+                    {{ message }}
+                </li>
+            {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    </div>
     {% block content %}
     {% endblock %}
     </body>

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, g, current_app
 
-music = Blueprint('music', __name__, template_folder='templates/music/')
+music = Blueprint('music', __name__, template_folder='templates/')
 
 @music.before_request
 def wrapper_setup():
@@ -25,4 +25,4 @@ def index():
     played = tracks[:index]
     future = tracks[index:]
 
-    return render_template('hello.html', tracks=future + played, current=current)
+    return render_template('music/hello.html', tracks=future + played, current=current)
