@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  nginx:
+    build: ./docker/nginx
+    image: minos/nginx
+    networks:
+      default:
+        aliases:
+        - minos.localhost.localdomain
+    ports:
+      - "8005:80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./static:/var/www/minos/
+
+  uwsgi:
+    build: ./docker/uwsgi
+    image: minos/uwsgi
+    networks:
+      default:
+        aliases:
+          - minosapp.localhost.localdomain
+    volumes:
+      - ./:/minos
+    environment:
+      - FLASK_SETTINGS=config.py
+
+  redis:
+    image: redis:latest
+    networks:
+      default:
+        aliases:
+          - redisminos.localhost.localdomain
+    volumes:
+      - ./var/redis:/data

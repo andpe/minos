@@ -12,6 +12,4 @@ def index():
     return redirect(url_for('music.index'))
 
 
-if __name__ == '__main__':
-    app = create_app()
-    app.run(debug=True)
+app = create_app()
