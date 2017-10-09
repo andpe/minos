@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, g, current_app
+from flask import Blueprint, render_template, redirect, url_for, g, current_app, make_response
 
 music = Blueprint('music', __name__, template_folder='templates/')
 
@@ -26,3 +26,19 @@ def index():
     future = tracks[index:]
 
     return render_template('music/hello.html', tracks=future + played, current=current)
+
+@music.route("/vote/<uri>/<direction>", methods=["POST"])
+def vote(uri, direction):
+    """ Handle votes up or down on tracks. """
+    import requests
+    import json
+
+    requests.post(
+        'http://nginx:81/pub/',
+        data=json.dumps({
+            'track': uri,
+            'direction': direction
+        })
+    )
+
+    return make_response('OK', 200, {})

@@ -11,7 +11,7 @@
         </thead>
         <tbody>
             {% for track in tracks %}
-                <tr {% if 1 == loop.index %} class="table-info"{% endif %}>
+                <tr class="track-row {% if 1 == loop.index %} table-info{% endif %}" data-uri="{{ track.uri }}">
                     <td>{{ track.title }}</td>
                     <td>
                         <span class="fa fa-thumbs-up float-left"></span>
@@ -22,4 +22,18 @@
         </tbody>
     </table>
 </div>
+{% endblock %}
+{% block end_scripts %}
+<script>
+    $(document).ready(function() {
+        $('.track-row td span.fa').on('click', function() {
+            $this = $(this);
+            var uri = $this.closest('tr').data('uri');
+
+            $.post(
+                '/music/vote/' + uri + '/up'
+            );
+        })
+    })
+</script>
 {% endblock %}
