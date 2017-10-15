@@ -103,6 +103,15 @@ class User(db.Model):
         # If any of the role names match ours then we have that role.
         return any(map(lambda r: r.name == role_name, self.roles))
 
+class UserVote(db.Model):
+    __tablename__ = 'votes'
+
+    __table_args__ = (db.PrimaryKeyConstraint('uid', 'uri', name='uservotes_pk'),)
+
+    uid = db.Column(db.ForeignKey('users.id'))
+    uri = db.Column(db.String(), nullable=False, index=True)
+    direction = db.Column(db.Integer, nullable=False)
+
 class Sessions(db.Model):
 
     """ Session object for Flask-Session. """

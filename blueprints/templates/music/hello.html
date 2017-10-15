@@ -14,7 +14,9 @@
                 <tr class="track-row {% if 1 == loop.index %} table-info{% endif %}" data-uri="{{ track.uri }}">
                     <td>{{ track.title }}</td>
                     <td>
-                        <span class="fa fa-thumbs-up float-left"></span>
+                        <span class="fa fa-thumbs-up float-left {% if track.uri.split('?')[0] in user_voted %}
+                            liked
+                        {% endif %}"></span>
                         <span class="fa fa-thumbs-down float-right"></span>
                     </td>
                 </tr>
@@ -27,13 +29,41 @@
 <script>
     $(document).ready(function() {
         $('.track-row td span.fa').on('click', function() {
-            $this = $(this);
+            var $this = $(this);
             var uri = $this.closest('tr').data('uri');
+            var offset = uri.indexOf('?'); // Trim any query string
+            var direction = $this.hasClass('fa-thumbs-up');
+
+            if(offset > 0)
+                uri = uri.substr(0, offset);
+
+            if(direction) {
+                $this.toggleClass('liked');
+            } else {
+                $this.toggleClass('disliked');
+            }
+
 
             $.post(
-                '/music/vote/' + uri + '/up'
+                '/music/vote/' + uri + '/' + (direction ? 'up' : 'down'),
+                function(data) {
+                    var alrt = $('<div class="alert alert-dismissable alert-warning fade show"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>You have already voted for this track.</div>');
+
+                    if(data != 'OK') {
+                        $('.alerts').append(alrt);
+                    } else {
+
+                    }
+                }
             );
         })
+
+        var ws = new WebSocket('ws://localhost:8005/sub');
+        ws.onmessage = function(message) {
+            var obj = JSON.parse(message.data);
+            console.log(obj.track + " was voted " + obj.direction);
+        }
     })
+
 </script>
 {% endblock %}

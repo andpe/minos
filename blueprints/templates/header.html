@@ -7,6 +7,7 @@
         Minos - {% block title %}Queue{% endblock %}
         </title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+        <link rel="stylesheet" href="/css/animations.css" type="text/css">
         <script
         src="https://code.jquery.com/jquery-3.2.1.min.js"
         integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
@@ -62,18 +63,16 @@
     {% endblock %}
     <div class="container">
     {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="alerts">
-            {% for message in messages %}
-                <div class="alert alert-dismissable alert-success fade show">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                    </button>
-                    {{ message }}
-                </li>
-            {% endfor %}
+        <div class="alerts">
+        {% for message in messages %}
+            <div class="alert alert-dismissable alert-success fade show">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                </button>
+                {{ message }}
             </div>
-        {% endif %}
+        {% endfor %}
+        </div>
     {% endwith %}
     </div>
     {% block content %}
