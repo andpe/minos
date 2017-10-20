@@ -1,11 +1,11 @@
 from flask import Blueprint, render_template, redirect, url_for, g, current_app, make_response, session
-from database import db
+from ..database import db
 
 music = Blueprint('music', __name__, template_folder='templates/')
 
 @music.before_request
 def wrapper_setup():
-    from sonos import SonosWrapper
+    from ..sonos import SonosWrapper
 
     # Create this with an empty config for now.
     g.sonos = SonosWrapper()
@@ -25,24 +25,23 @@ def redis_connect():
 @music.route("/")
 def index():
     import urllib.parse
-    tracks = g.sonos.get_queue()
-    current = g.sonos.get_current_track_info()
 
-    index = int(current['playlist_position'])
+    tracks = current_app.cache.get('minos_tracklist')
+    current = current_app.cache.get('minos_current_song')
+
+    index = int(current.playlist_position)
     tracks = list(tracks)
     played = tracks[:index]
     future = tracks[index:]
 
-    for track in tracks:
-        track['uri'] = urllib.parse.unquote(track['uri'])
 
     user_voted = []
 
     if 'username' in session:
-        from database import UserVote, User
+        from ..database import UserVote, User
         user = db.session.query(User).filter(User.name == session['username']).first()
         user_voted = db.session.query(UserVote).filter(UserVote.uid == User.id).all()
-        user_voted = [urllib.parse.unquote(x.uri) for x in user_voted]
+        user_voted = {urllib.parse.unquote(x.uri): x.direction for x in user_voted}
 
     return render_template('music/hello.html', tracks=future + played, current=current, user_voted=user_voted)
 
@@ -54,7 +53,7 @@ def vote(uri, direction):
 
 
     if 'username' in session:
-        from database import UserVote, User
+        from ..database import UserVote, User
         user = db.session.query(User).filter(User.name == session['username']).first()
         vote = vote_exists(user, uri)
         if not vote:
@@ -64,6 +63,18 @@ def vote(uri, direction):
             )
             db.session.flush()
             db.session.commit()
+
+            #if direction == 'down':
+            #    tracks = current_app.cache.get('minos_tracklist')
+            #    new = []
+            #    print(tracks)
+            #    for track in tracks:
+            #        if track.uri.split('?')[0] == uri:
+            #            print('Skipping!')
+            #            continue
+            #        new.append(track)
+            #    print(new)
+            #    current_app.cache.set('minos_tracklist', new)
  
             requests.post(
                 'http://nginx:81/pub/',
@@ -84,7 +95,7 @@ def vote(uri, direction):
 # Vote helpers
 def vote_exists(user, uri):
     """ Check if a vote from this user for this track already exists. """
-    from database import UserVote
+    from ..database import UserVote
     vote = db.session.query(UserVote).filter(UserVote.uid == user.id, UserVote.uri == uri).first()
 
     return vote

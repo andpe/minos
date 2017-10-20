@@ -11,4 +11,4 @@ RUN python3 -m pip install -r /requirements.txt
 
 EXPOSE 8005
 
-CMD ["uwsgi", "--plugin", "python3", "--wsgi-file", "minos.py", "--callable", "app", "--processes", "1", "--threads", "8", "--socket", "0.0.0.0:8005", "--py-autoreload=5"]
+CMD ["uwsgi", "--plugin", "python3", "--wsgi-file", "server.py", "--callable", "app", "--processes", "1", "--threads", "8", "--socket", "0.0.0.0:8005", "--py-autoreload=5"]

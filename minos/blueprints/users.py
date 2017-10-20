@@ -1,5 +1,5 @@
-from authentication.twitter import twitter
-from database import User
+from ..authentication.twitter import twitter
+from ..database import User
 from flask import (Blueprint, current_app, flash, g, redirect, render_template,
                    request, session, url_for)
 
@@ -22,14 +22,14 @@ def login_twitter():
 
 @users.route("/oauth_authorize_twitter", methods=['GET', 'POST'])
 def oauth_authorize_twitter():
-    from database import db
+    from ..database import db
 
     next_url = request.args.get('next', None) or url_for('music.index')
     resp = twitter.authorized_response()
 
     if resp is None:
         flash('Request denied')
-    
+ 
     session['twitter_token'] = (
         resp['oauth_token'],
         resp['oauth_token_secret']

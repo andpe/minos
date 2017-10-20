@@ -1,18 +1,20 @@
 from flask import Flask
 from flask_caching import Cache
+from .celery_wrap import make_celery
 
 # We need access to these right away
 app = Flask('Minos')
 app.config.from_envvar('FLASK_SETTINGS')
 cache = Cache()
 app.cache = cache
+celery = make_celery(app)
 
 def create_app(init=False):
     """ Create a new flask app. """
-    global app, cache, oauth
-
-    from database import db
+    from .database import db
     from flask_session import Session
+
+    global app, cache, oauth, inited
 
     # Create flask apps and plugins
     session = Session()
@@ -26,11 +28,11 @@ def create_app(init=False):
 
     # If we're not doing init stuff then we can load blueprints.
     if not init:
-        from blueprints.music import music
+        from minos.blueprints.music import music
         # Register blueprints
         app.register_blueprint(music, url_prefix='/music')
 
-        from blueprints.users import users
+        from minos.blueprints.users import users
         app.register_blueprint(users, url_prefix='/users')
 
     return app

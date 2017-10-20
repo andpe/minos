@@ -11,13 +11,12 @@
         </thead>
         <tbody>
             {% for track in tracks %}
-                <tr class="track-row {% if 1 == loop.index %} table-info{% endif %}" data-uri="{{ track.uri }}">
-                    <td>{{ track.title }}</td>
-                    <td>
-                        <span class="fa fa-thumbs-up float-left {% if track.uri.split('?')[0] in user_voted %}
-                            liked
-                        {% endif %}"></span>
-                        <span class="fa fa-thumbs-down float-right"></span>
+                {% set track_uri = track.get_unique_id() %}
+                <tr class="track-row {% if 1 == loop.index %} table-info{% endif %}" data-uri="{{ track.get_unique_id() }}">
+                    <td>{{ track.title }} - {{ track.artist }}</td>
+                    <td class="voteButtons">
+                        <span class="fa fa-thumbs-up float-left {% if user_voted[track_uri] is defined and user_voted[track_uri] == 'up' %}liked{% endif %}"></span>
+                        <span class="fa fa-thumbs-down float-right {% if user_voted[track_uri] is defined and user_voted[track_uri] == 'down' %}disliked{% endif %}"></span>
                     </td>
                 </tr>
             {% endfor %}
@@ -37,11 +36,6 @@
             if(offset > 0)
                 uri = uri.substr(0, offset);
 
-            if(direction) {
-                $this.toggleClass('liked');
-            } else {
-                $this.toggleClass('disliked');
-            }
 
 
             $.post(
@@ -52,7 +46,11 @@
                     if(data != 'OK') {
                         $('.alerts').append(alrt);
                     } else {
-
+                        if(direction) {
+                            $this.closest('.voteButtons').find('.fa-thumbs-up').toggleClass('liked');
+                        } else {
+                            $this.closest('.voteButtons').find('.fa-thumbs-down').toggleClass('disliked');
+                        }
                     }
                 }
             );

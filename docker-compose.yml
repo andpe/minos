@@ -34,3 +34,17 @@ services:
           - redisminos.localhost.localdomain
     volumes:
       - ./var/redis:/data
+  
+  celery:
+    depends_on:
+        - redis
+    image: minos/celery
+    build: ./docker/celery
+    networks:
+      default:
+        aliases:
+          - celeryminos.localhost.localdomain
+    volumes:
+      - ./:/minos
+    environment:
+      - FLASK_SETTINGS=config.py

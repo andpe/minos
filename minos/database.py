@@ -1,6 +1,6 @@
 """ Database-related functionality for Minos. """
 from flask_sqlalchemy import SQLAlchemy
-from app import app, cache
+from .app import app, cache
 
 db = SQLAlchemy()
 

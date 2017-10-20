@@ -1,7 +1,7 @@
 """ Initialization script for Minos. """
 
-from app import create_app
-from database import db
+from minos.app import create_app
+from minos.database import db
 
 # Create the app and push the context
 app = create_app(init=True)

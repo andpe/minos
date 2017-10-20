@@ -1,6 +1,6 @@
-from authentication import oauth
-from database import db, OAuthConfig
-from app import app
+from . import oauth
+from ..database import db, OAuthConfig
+from ..app import app
 
 twitter = None
 
