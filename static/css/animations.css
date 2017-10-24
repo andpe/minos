@@ -1,0 +1,40 @@
+@keyframes pulse_like {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 0, 255, 0.4)
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(0, 0, 255, 0.0)
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 0, 255, 0.0)
+    }
+}
+
+@keyframes pulse_dislike {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4)
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(255, 0, 0, 0.0)
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.0)
+    }
+}
+
+.track-row td span {
+    border-radius: 16px;
+    transition: color .2s;
+}
+
+.liked {
+    color: rgb(0, 0, 255);
+    animation: pulse_like .5s 1;
+    animation-delay: .2s;
+}
+
+.disliked {
+    color: rgb(255, 0, 0);
+    animation: pulse_dislike .5s 1;
+    animation-delay: .2s;
+}

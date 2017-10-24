@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Oh shit, something broke.</title>
+    </head>
+    <body>
+        <h1>Status 500 - Internal Server Error</h1>
+        <p>Shit blew up, whoops.</p>
+        {% if config.DEBUG %}
+        <!-- Only display the traceback in debug mode... -->
+        <pre>{{ exc | join("\n")}}</pre>
+        {% endif %}
+    </body>
+</html>
