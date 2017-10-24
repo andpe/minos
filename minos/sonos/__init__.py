@@ -31,18 +31,19 @@ class SonosWrapper(object):
     """ A wrapper around some SoCo calls to simplify things. """
 
     debug = False
-    speakers = []
+    speakers = None
     sonos = None
 
-    def __init__(self, config=None):
-        # TODO: Write later when we have access to the speakers...
-        #self.speakers = soco.discover()
-        self.sonos = soco.SoCo("10.203.70.133")
+    def __init__(self, speakers):
+        self.speakers = speakers
 
     def toggle_debug(self):
         self.debug = not(self.debug)
 
-    def get_current_track_info(self):
+    def get_speakers(self):
+        return self.speakers
+
+    def get_current_track_info(self, ip):
         if self.debug:
             return Track(**{
                 'title': '99',
@@ -55,9 +56,9 @@ class SonosWrapper(object):
                 'resources': [Resources(uri='x-sonos-spotify:spotify%3atrack%3a4oz7fKT4bJ04KCaMM7Sp03?sid=9&flags=8224&sn=1')],
             })
         else:
-            return Track(**self.sonos.get_current_track_info())
+            return Track(**self.speakers[ip].get_current_track_info())
     
-    def get_queue(self):
+    def get_queue(self, ip):
         songs = []
         if self.debug:
             songs.extend([
@@ -85,7 +86,7 @@ class SonosWrapper(object):
                 })
             ])
         else:
-            sonos_songs = list(self.sonos.get_queue())
+            sonos_songs = self.speakers[ip].get_queue()
 
             for song in sonos_songs:
                 s = {

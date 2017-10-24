@@ -5,28 +5,50 @@ from ..sonos import SonosWrapper
 celery.conf.beat_schedule = {
     'sonos-queue-update': {
         'task': 'minos.tasks.sonos_queue_refresh',
-        'schedule': 60,
+        'schedule': 10,
         'args': (1, 2),
     },
 }
 
 app = create_app(True)
-sonos = SonosWrapper()
 
 @celery.task
 def sonos_queue_refresh(a, b):
     from urllib.parse import unquote
     from flask import current_app
+    from ..database import SonosConfig, db
+    from flask import current_app
+    import soco
+    from hashlib import sha256
 
-    #if current_app.debug and not sonos.debug:
-    #    sonos.toggle_debug()
+    speakers = {}
+    with current_app.app_context():
+        speakers = db.session.query(SonosConfig).filter(
+            SonosConfig.key == 'speakers'
+        ).first()
 
-    wrapper = sonos
-    tracks = wrapper.get_queue()
-    current = wrapper.get_current_track_info()
+        if speakers:
+            from json import loads
+            speakers = loads(speakers.value)
+            speakers = {x: soco.SoCo(x) for x in speakers}
+        else:
+            speakers = {
+                '10.203.70.133': soco.SoCo('10.203.70.133')
+            }
 
-    if len(tracks) > 0:
-        current_app.cache.set('minos_tracklist', tracks)
-        current_app.cache.set('minos_current_song', current)
-    else:
-        pass
+    sonos = SonosWrapper(speakers)
+
+    if current_app.debug and not sonos.debug:
+        sonos.toggle_debug()
+
+    for ip, so in sonos.get_speakers().items():
+        tracks = sonos.get_queue(ip)
+        current = sonos.get_current_track_info(ip)
+
+        if len(tracks) > 0:
+            sha = sha256()
+            sha.update(ip.encode('utf-8'))
+            current_app.cache.set('minos_tracklist_' + sha.hexdigest(), tracks)
+            current_app.cache.set('minos_current_song_' + sha.hexdigest(), current)
+        else:
+            pass
