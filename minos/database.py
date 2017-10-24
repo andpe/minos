@@ -13,6 +13,7 @@ class SonosConfig(db.Model):
 
     key = db.Column(db.String, nullable=False, primary_key=True)
     value = db.Column(db.String)
+    _type = db.Column('type', db.String)
 
 
 class OAuthConfig(db.Model):
@@ -110,6 +111,7 @@ class UserVote(db.Model):
 
     uid = db.Column(db.ForeignKey('users.id'))
     uri = db.Column(db.String(), nullable=False, index=True)
+    speaker = db.Column(db.String, nullable=False)
     direction = db.Column(db.Integer, nullable=False)
 
 class Sessions(db.Model):

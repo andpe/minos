@@ -12,13 +12,23 @@
         <tbody>
             {% for track in tracks %}
                 {% set track_uri = track.get_unique_id() %}
-                <tr class="track-row {% if 1 == loop.index %} table-info{% endif %}" data-uri="{{ track.get_unique_id() }}">
+                <tr class="track-row {% if 1 == loop.index %} table-info{% endif %} track{{ track.get_unique_id() }}" data-uri="{{ track.get_unique_id() }}">
                     <td>{{ track.title }} - {{ track.artist }}</td>
                     <td class="voteButtons">
-                        <span class="fa fa-thumbs-up float-left {% if user_voted[track_uri] is defined and user_voted[track_uri] == 'up' %}liked{% endif %}"></span>
-                        <span class="fa fa-thumbs-down float-right {% if user_voted[track_uri] is defined and user_voted[track_uri] == 'down' %}disliked{% endif %}"></span>
+                        <div class="float-left">
+                            <span class="badge badge-success">{{ votes_total_up[track_uri] | default('0')}}</span>
+                            <span class="fa fa-thumbs-up {% if user_voted[track_uri] is defined and user_voted[track_uri] == 'up' %}liked{% endif %}"></span>
+                        </div>
+                        <div class="float-right">
+                            <span class="badge badge-danger">{{ votes_total_down[track_uri] | default('0') }}</span>
+                            <span class="fa fa-thumbs-down {% if user_voted[track_uri] is defined and user_voted[track_uri] == 'down' %}disliked{% endif %}"></span>
+                        </div>
                     </td>
                 </tr>
+            {% else %}
+            <tr>
+                <td>And on this Sonos device! Has it been configured for polling?</td>
+            </tr>
             {% endfor %}
         </tbody>
     </table>
@@ -36,8 +46,6 @@
             if(offset > 0)
                 uri = uri.substr(0, offset);
 
-
-
             $.post(
                 '/music/vote/' + uri + '/' + (direction ? 'up' : 'down'),
                 function(data) {
@@ -47,9 +55,9 @@
                         $('.alerts').append(alrt);
                     } else {
                         if(direction) {
-                            $this.closest('.voteButtons').find('.fa-thumbs-up').toggleClass('liked');
+                            var thumbsUp = $this.closest('.voteButtons').find('.fa-thumbs-up').toggleClass('liked');
                         } else {
-                            $this.closest('.voteButtons').find('.fa-thumbs-down').toggleClass('disliked');
+                            var thumbsUp = $this.closest('.voteButtons').find('.fa-thumbs-down').toggleClass('disliked');
                         }
                     }
                 }
@@ -59,7 +67,22 @@
         var ws = new WebSocket('ws://localhost:8005/sub');
         ws.onmessage = function(message) {
             var obj = JSON.parse(message.data);
-            console.log(obj.track + " was voted " + obj.direction);
+
+            var votesUp = $('.track' + obj.track).find('.voteButtons').find('.badge-success');
+            var votesDown = $('.track' + obj.track).find('.voteButtons').find('.badge-danger');
+            var val = 0;
+            if(obj.removed) {
+                console.log(obj.track + " vote in direction " + obj.direction + " was removed");
+                val = -1;
+            } else {
+                console.log(obj.track + " was voted " + obj.direction);
+                val = 1;
+            }
+
+            if(obj.direction == 'up')
+                votesUp.text(parseInt(votesUp.text()) + val);
+            else
+                votesDown.text(parseInt(votesDown.text()) + val);
         }
     })
 

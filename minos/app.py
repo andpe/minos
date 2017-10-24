@@ -3,7 +3,7 @@ from flask_caching import Cache
 from .celery_wrap import make_celery
 
 # We need access to these right away
-app = Flask('Minos')
+app = Flask('Minos', template_folder='minos/blueprints/templates')
 app.config.from_envvar('FLASK_SETTINGS')
 cache = Cache()
 app.cache = cache
